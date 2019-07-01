@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://unpkg.com/konva@3.3.3/konva.min.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/designer.js"></script>
+    <meta charset="utf-8" />
+    <title>Konva Groups Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script>
+        var designer;
+        window.onload = function () {
+            designer = new Designer();
+            let table = designer.createTable("chr.history_data");
+            let cellContent = [
+                ["data_time", "timestamp(6)", "Y"],
+                ["mn_code", "varchar(100)", "Y"],
+                ["data_value", "numeric(12,5)", "N"]
+            ];
+            for (let i = 0; i < 3; i++) {
+                table.addRow(...cellContent[i])
+            };
+
+            table = designer.createTable("rpt.owl_device_hour", 200,300);
+            cellContent = [
+                ["data_time", "timestamp(6)", "Y"],
+                ["device_id", "varchar(100)", "Y"],
+                ["data_value", "numeric(12,5)", "N"]
+            ];
+            for (let i = 0; i < 3; i++) {
+                table.addRow(...cellContent[i])
+            };
+
+            designer.createRelation("chr.history_data", "data_time", "rpt.owl_device_hour", "data_time")
+
+            table = designer.createTable("rpt.owl_enterprise_hour", 200,500);
+            cellContent = [
+                ["data_time", "timestamp(6)", "Y"],
+                ["enterprise_code", "varchar(100)", "Y"],
+                ["data_value", "numeric(12,5)", "N"]
+            ];
+            for (let i = 0; i < 3; i++) {
+                table.addRow(...cellContent[i])
+            };
+
+            designer.createRelation("rpt.owl_enterprise_hour", "data_time", "rpt.owl_device_hour", "data_time")
+
+            designer.flush();
+        }
+    </script>
+</body>
+
+</html>
