@@ -129,13 +129,14 @@ class Designer {
 
     changeRelationPos(tableName, e) {
         for (let rel of this.relations) {
-            if (rel.srcTable.tableName === tableName || rel.tgtTableame === tableName) {
+            if (rel.srcTable.tableName === tableName || rel.tgtTable.tableName === tableName) {
                 //rel.line.group.destroy(true);
                 // rel.line.group.preventDefault();
                 // console.log(rel, rel.line, rel.line.group);
                 // console.log(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
                 // this.createRelation(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
                 // rel.line.group.preventDefault();
+                console.log("ok");
 
                 [rel.line.source, rel.line.target] = this.fetchConnectPoint(rel.srcTable, rel.srcColumns, rel.tgtTable, rel.tgtColumns);
                 
