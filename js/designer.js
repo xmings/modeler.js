@@ -51,7 +51,8 @@ class Designer {
             x: posX || 120,
             y: posY || 40,
             //rotation: 20,
-            draggable: true
+            draggable: true,
+            shadowBlur: 10,
         });
         let table = new Table(tableGroup);
         table.setHeader(tableName);
@@ -106,7 +107,7 @@ class Designer {
         relation.srcColumns = srcColList;
         relation.tgtColumns = tgtColList;
         let lineGroup = new Konva.Group({
-            draggable: true
+            draggable: false
         });
         this.layer.add(lineGroup);
 

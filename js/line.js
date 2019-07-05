@@ -18,20 +18,22 @@ class Line {
             srcMidX = this.source[0][0],
             tgtMidX = this.target[0][0];
 
-        if (srcMidX === tgtMidX) {
-            console.log("heare");
+        let rate = Math.abs((srcMidY - tgtMidY) / (srcMidX - tgtMidX));
+        this.srcFocusX = srcMidX < tgtMidX ? srcMidX + this.focusDistance : srcMidX - this.focusDistance;
+        this.srcFocusY = srcMidY < tgtMidY ? srcMidY + rate * this.focusDistance : srcMidY - rate * this.focusDistance;
+        this.tgtFocusX = srcMidX < tgtMidX ? tgtMidX - this.focusDistance : tgtMidX + this.focusDistance;
+        this.tgtFocusY = srcMidY < tgtMidY ? tgtMidY - rate * this.focusDistance : tgtMidY + rate * this.focusDistance;
+
+        //两个FocusY坐标不能超过两个MidY坐标的范围
+        if (this.srcFocusY < Math.min(srcMidY, tgtMidY)
+            || this.srcFocusY > Math.max(srcMidY, tgtMidY)) {
             this.srcFocusX = srcMidX;
-            this.srcFocusY = srcMidY < tgtMidY ? srcMidY + this.focusDistance : srcMidY - this.focusDistance;
+            this.srcFocusY = srcMidY;
             this.tgtFocusX = tgtMidX;
-            this.tgtFocusY = srcMidY < tgtMidY ? tgtMidY - this.focusDistance : tgtMidY - this.focusDistance;
-            console.log(this.srcFocusY, this.tgtFocusY);
-        } else {
-            let rate = Math.abs((srcMidY - tgtMidY) / (srcMidX - tgtMidX));
-            this.srcFocusX = srcMidX < tgtMidX ? srcMidX + this.focusDistance : srcMidX - this.focusDistance;
-            this.srcFocusY = srcMidY < tgtMidY ? srcMidY + rate * this.focusDistance : srcMidY - rate * this.focusDistance;
-            this.tgtFocusX = srcMidX < tgtMidX ? tgtMidX - this.focusDistance : tgtMidX + this.focusDistance;
-            this.tgtFocusY = srcMidY < tgtMidY ? tgtMidY - rate * this.focusDistance : tgtMidY + rate * this.focusDistance;
+            this.tgtFocusY = tgtMidY;
         }
+
+
     }
 
     start() {
@@ -50,6 +52,7 @@ class Line {
             let line = new Konva.Line({
                 points: [pos[0], pos[1], this.tgtFocusX, this.tgtFocusY],
                 stroke: 'black',
+
             });
             this.tgtLines.push(line);
             this.group.add(line);
