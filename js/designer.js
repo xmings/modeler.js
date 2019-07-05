@@ -1,38 +1,13 @@
 class Relation {
-    constructor(sTableName, sColumnName, tTableName, tColumnName) {
-        this.sTableName = sTableName;
-        this.sColumnName = sColumnName;
-        this.tTableName = tTableName;
-        this.tColumnName = tColumnName;
-    }
-
-    setSGroupPos(x, y) {
-        this.startPosX = x;
-        this.startPosY = y;
-    }
-
-    getSGroupPos() {
-        return [this.startPosX, this.startPosY];
-    }
-
-    setTGroupPos(x, y) {
-        this.endPosX = x;
-        this.endPosY = y;
-    }
-
-    getTGroupPos() {
-        return [this.endPosX, this.endPosY];
-    }
-
-    setArrow(arrow) {
-        this.arrow = arrow;
-    }
-
-    getArrow() {
-        return this.arrow;
+    constructor(srcTable, tgtTable) {
+        this.srcTable = srcTable;
+        this.tgtTable = tgtTable;
+        this.srcColumns = [];
+        this.tgtColumns = [];
+        this.relationId = 1;
+        this.line = null;
     }
 }
-
 
 class Designer {
     constructor() {
@@ -84,7 +59,7 @@ class Designer {
         this.layer.add(tableGroup);
 
         tableGroup.on('dragmove', (e) => {
-            this.moveArrow(tableName, e);
+            this.changeRelationPos(tableName, e);
         });
 
         tableGroup.on('mouseenter', () => {
@@ -99,82 +74,77 @@ class Designer {
     }
 
     fetchTableByName(tableName) {
-        let table;
-        this.tables.forEach(function (t, index) {
+        for (let t of this.tables) {
             if (t.tableName === tableName) {
-                table = t;
+                return t;
             }
-        });
-        return table;
+        }
     }
 
-    createRelation(sTableN, sColumnN, tTableN, tColumnN, mapRelation) {
-        let sTable = this.fetchTableByName(sTableN),
-            tTable = this.fetchTableByName(tTableN),
-            sColumnIndex = sTable.columnNames.indexOf(sColumnN),
-            tColumnIndex = tTable.columnNames.indexOf(tColumnN);
+    fetchConnectPoint(srcTable, srcCols, tgtTable, tgtCols) {
+        let srcColsPos = [], tgtColsPos = [];
+        let srcX = srcTable.group.x() < tgtTable.group.x() ? srcTable.group.x() + srcTable.headerWidth : srcTable.group.x();
+        let tgtX = srcTable.group.x() < tgtTable.group.x() ? tgtTable.group.x() : tgtTable.group.x() + tgtTable.headerWidth;
 
-        let startPosX, startPosY, endPosX, endPosY;
-        let sGroupPosX = sTable.group.x(),
-            sGroupPosY = sTable.group.y(),
-            tGroupPosX = tTable.group.x(),
-            tGroupPosY = tTable.group.y();
-
-        if (sGroupPosX < tGroupPosX) {
-            startPosX = sGroupPosX + sTable.headerWidth;
-            startPosY = sGroupPosY + sTable.headerHeight + sTable.cellHeight * sColumnIndex + sTable.cellHeight / 2;
-            endPosX = tGroupPosX;
-            endPosY = tGroupPosY + tTable.headerHeight + tTable.cellHeight * tColumnIndex + tTable.cellHeight / 2;
-        } else {
-            startPosX = sGroupPosX;
-            startPosY = sGroupPosY + sTable.headerHeight + sTable.cellHeight * sColumnIndex + sTable.cellHeight / 2;
-            endPosX = tGroupPosX + tTable.headerWidth;
-            endPosY = tGroupPosY + tTable.headerHeight + tTable.cellHeight * tColumnIndex + tTable.cellHeight / 2;
+        for (let col of srcCols) {
+            let srcY = srcTable.columnNames.indexOf(col) * srcTable.cellHeight + srcTable.cellHeight / 2 + srcTable.headerHeight + srcTable.group.y();
+            srcColsPos.push([srcX, srcY]);
         }
-        console.log(startPosX, startPosY, endPosX, endPosY);
 
-        let arrow = new Konva.Arrow({
-            points: [startPosX, startPosY, endPosX, endPosY],
-            pointerLength: 10,
-            pointerWidth: 10,
-            fill: 'black',
-            stroke: 'black',
-            strokeWidth: 1
+        for (let col of tgtCols) {
+            let tgtY = tgtTable.columnNames.indexOf(col) * tgtTable.cellHeight + tgtTable.cellHeight / 2 + tgtTable.headerHeight + tgtTable.group.y();
+            tgtColsPos.push([tgtX, tgtY]);
+        }
+        return [srcColsPos, tgtColsPos];
+    }
+
+    createRelation(srcTabName, srcColList, tgtTabName, tgtColList, relationId) {
+        let srcTable = this.fetchTableByName(srcTabName),
+            tgtTable = this.fetchTableByName(tgtTabName);
+
+        let relation = new Relation(srcTable, tgtTable);
+        relation.srcColumns = srcColList;
+        relation.tgtColumns = tgtColList;
+        let lineGroup = new Konva.Group({
+            draggable: true
         });
-        this.layer.add(arrow);
+        this.layer.add(lineGroup);
 
-        let relation = new Relation(sTableN, sColumnN, tTableN, tColumnN);
-        relation.setSGroupPos(sGroupPosX, sGroupPosY);
-        relation.setTGroupPos(tGroupPosX, tGroupPosY);
-        relation.setArrow(arrow);
+        relation.line = new Line(lineGroup);
+        relation.relationId = relationId || 1;
+        [relation.line.source, relation.line.target] = this.fetchConnectPoint(srcTable, srcColList, tgtTable, tgtColList);
+        relation.line.start();
+
+        for (let r of this.relations) {
+            if (r.srcTable.tableName === srcTabName
+                && r.tgtTable.tableName === tgtTabName) {
+                return;
+            }
+        }
+
         this.relations.push(relation);
     }
 
 
-    moveArrow(tableName, e) {
-        let arrow;
+    changeRelationPos(tableName, e) {
         for (let rel of this.relations) {
-            arrow = rel.getArrow();
-            if (rel.sTableName === tableName) {
-                let [sGroupPosX, sGroupPosY] = rel.getSGroupPos();
-                let offsetX = e.target.x() - sGroupPosX;
-                let offsetY = e.target.y() - sGroupPosY;
+            if (rel.srcTable.tableName === tableName || rel.tgtTableame === tableName) {
+                //rel.line.group.destroy(true);
+                // rel.line.group.preventDefault();
+                // console.log(rel, rel.line, rel.line.group);
+                // console.log(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
+                // this.createRelation(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
+                // rel.line.group.preventDefault();
 
-                let pos = arrow.points();
-                arrow.setAttr('points', [pos[0] + offsetX, pos[1] + offsetY, pos[2], pos[3]]);
-                rel.setSGroupPos(e.target.x(), e.target.y());
-
-            } else if (rel.tTableName === tableName) {
-                let [tGroupPosX, tGroupPosY] = rel.getTGroupPos();
-                let offsetX = e.target.x() - tGroupPosX;
-                let offsetY = e.target.y() - tGroupPosY;
-
-                let pos = arrow.points();
-                arrow.setAttr('points', [pos[0], pos[1], pos[2] + offsetX, pos[3] + offsetY]);
-                rel.setTGroupPos(e.target.x(), e.target.y());
+                [rel.line.source, rel.line.target] = this.fetchConnectPoint(rel.srcTable, rel.srcColumns, rel.tgtTable, rel.tgtColumns);
+                
+                rel.line.reDraw();
+                
             }
         }
     }
+
+
 
     flush() {
         this.stage.add(this.layer);
