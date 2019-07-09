@@ -1,3 +1,6 @@
+import { Line } from './line.js';
+import { Table } from './table.js';
+
 class Relation {
     constructor(srcTable, tgtTable) {
         this.srcTable = srcTable;
@@ -9,7 +12,7 @@ class Relation {
     }
 }
 
-class Designer {
+export default class Designer {
     constructor() {
         this.stage = new Konva.Stage({
             container: container || 'body',
@@ -53,6 +56,12 @@ class Designer {
             //rotation: 20,
             draggable: true,
             shadowBlur: 10,
+            shadowColor: 'black',
+            shadowOffset: {
+                x: 5,
+                y: 5
+            },
+            shadowOpacity: 0.6,
         });
         let table = new Table(tableGroup);
         table.setHeader(tableName);
@@ -136,12 +145,12 @@ class Designer {
                 // console.log(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
                 // this.createRelation(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
                 // rel.line.group.preventDefault();
-                console.log("ok");
+                //console.log("ok");
 
                 [rel.line.source, rel.line.target] = this.fetchConnectPoint(rel.srcTable, rel.srcColumns, rel.tgtTable, rel.tgtColumns);
-                
+
                 rel.line.reDraw();
-                
+
             }
         }
     }
