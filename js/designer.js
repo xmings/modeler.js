@@ -155,6 +155,13 @@ export default class Designer {
         }
     }
 
+    fetchAllTablesPos(){
+        let tablesPos = new Map();
+        for (let t in this.tables){
+            tablesPos.set(t.tableName, [t.group.x, t.group.y]);
+        }
+        return tablesPos;
+    }
 
 
     flush() {
