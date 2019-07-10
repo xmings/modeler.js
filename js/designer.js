@@ -13,7 +13,7 @@ class Relation {
 }
 
 export default class Designer {
-    constructor() {
+    constructor(container) {
         this.stage = new Konva.Stage({
             container: container || 'body',
             width: window.innerWidth,
