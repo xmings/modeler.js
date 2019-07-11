@@ -12,10 +12,10 @@ class Relation {
     }
 }
 
-export default class Designer {
+export class Designer {
     constructor(container) {
         this.stage = new Konva.Stage({
-            container: container || 'body',
+            container: container,
             width: window.innerWidth,
             height: window.innerHeight
         });

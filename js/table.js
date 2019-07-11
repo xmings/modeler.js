@@ -1,4 +1,4 @@
-export default class Table {
+export class Table {
     constructor(group){
         this.group = group;
         this.headerWidth = 300;
@@ -68,7 +68,7 @@ export default class Table {
         this.rowCount += 1;
     }
 
-    updateCell = function (columnName, dataType, notNull) {
+    updateCell(columnName, dataType, notNull) {
     
     }
     

@@ -1,4 +1,4 @@
-export default class Line {
+export class Line {
     constructor(group) {
         this.group = group;
         this.source = [];
