@@ -9,6 +9,7 @@ class Relation {
         this.tgtColumns = [];
         this.relationId = 1;
         this.line = null;
+        this.selectedTableName = null;
     }
 }
 
@@ -55,13 +56,6 @@ export class Designer {
             y: posY || 40,
             //rotation: 20,
             draggable: true,
-            shadowBlur: 10,
-            shadowColor: 'black',
-            shadowOffset: {
-                x: 5,
-                y: 5
-            },
-            shadowOpacity: 0.6,
         });
         let table = new Table(tableGroup);
         table.setHeader(tableName);
@@ -79,6 +73,14 @@ export class Designer {
         tableGroup.on('mouseleave', () => {
             this.stage.container().style.cursor = 'default';
         });
+
+        tableGroup.on('click', () => {
+            for (let h of this.stage.find('.header')) {
+                h.setAttr("fontSize", 20);
+            }
+            tableGroup.findOne('.header').setAttr("fontSize", 26);
+            this.selectedTableName = tableName;
+        })
 
         return table;
     }
@@ -155,14 +157,28 @@ export class Designer {
         }
     }
 
-    fetchAllTablesPos(){
+    fetchAllTablesPos() {
         let tablesPos = new Map();
-        for (let t in this.tables){
+        for (let t of this.tables) {
             tablesPos.set(t.tableName, [t.group.x, t.group.y]);
         }
         return tablesPos;
     }
 
+    dropTableByTableName(tableName) {
+        if (tableName !== null) {
+            let table = this.fetchTableByName(tableName);
+            for (let r of this.relations) {
+                if (r.srcTable.tableName === tableName) {
+                    r.line.group.destroy(true);
+                } else if (r.tgtTable.tableName === tableName) {
+                    r.line.group.destroy(true);
+                }
+            }
+            table.group.destroy(true);
+            this.flush();
+        }
+    }
 
     flush() {
         this.stage.add(this.layer);

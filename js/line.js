@@ -32,8 +32,6 @@ export class Line {
             this.tgtFocusX = tgtMidX;
             this.tgtFocusY = tgtMidY;
         }
-
-
     }
 
     start() {

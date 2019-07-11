@@ -25,6 +25,7 @@ export class Table {
         this.group.add(new Konva.Text({
             x: 0,
             y: 0,
+            name: "header",
             text: this.tableName,
             fontSize: 20,
             fontFamily: 'Calibri',

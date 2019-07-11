@@ -4,6 +4,7 @@ modeler.js是基于Konva开发的一款HTML模型展示工具
 ![效果图](https://github.com/xmings/modeler.js/blob/master/usage.gif)
 
 ## SHOW
+
 1. Install nodejs (or other web server)
 2. Clone this project to your computer
 ``` bash
