@@ -14,12 +14,17 @@ class Relation {
 }
 
 export class Designer {
-    constructor(container) {
+    constructor(options) {
+        options = options || {
+            container: "container",
+            contextmenu: "contextmenu"
+        }
         this.stage = new Konva.Stage({
-            container: container,
+            container: options.container,
             width: window.innerWidth,
             height: window.innerHeight
         });
+        this.contextmenu = $("#"+options.contextmenu);
         this.layer = new Konva.Layer();
         this.gridInterval = 32;
         this.initGrid();
@@ -48,6 +53,17 @@ export class Designer {
             });
             this.layer.add(line)
         };
+
+        this.stage.on("click", ()=> {
+            this.contextmenu.hide();
+        });
+
+        // this.contextmenu.find(".item").on("click", function(){
+        //     $(this).parent().hide();
+        // })
+        this.contextmenu.find(".item").click(function(){
+            $(this).parent().hide();
+        })
     }
 
     createTable(tableName, posX, posY) {
@@ -74,13 +90,12 @@ export class Designer {
             this.stage.container().style.cursor = 'default';
         });
 
-        tableGroup.on('click', () => {
-            for (let h of this.stage.find('.header')) {
-                h.setAttr("fontSize", 20);
-            }
-            tableGroup.findOne('.header').setAttr("fontSize", 26);
+        tableGroup.on('contextmenu', (e) => {
+            console.log("right click");
+            this.contextmenu.css({"left": e.evt.x, "top": e.evt.y}).show();
             this.selectedTableName = tableName;
-        })
+            e.evt.preventDefault(true);
+        });
 
         return table;
     }
@@ -176,6 +191,8 @@ export class Designer {
                 }
             }
             table.group.destroy(true);
+            this.tables.splice(this.tables.indexOf(table), 1);
+            this.relations.splice(this.relations.findIndex(r=>r.srcTable === table||r.tgtTable === table), 1);
             this.flush();
         }
     }

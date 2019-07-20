@@ -18,7 +18,7 @@
         }
 
         #toolbar {
-            position: absolute;
+            position: fixed;
             top: 0;
             right: 0;
             z-index: 1000;
@@ -33,21 +33,23 @@
             user-select: none;
         }
 
+        #toolbar>button {
+            margin: 1rem 10px;
+        }
+
+        .ui.vertical.menu {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <div id="container"></div>
-    <div id="toolbar" class="ui toolbar inline">
-        <div class="ui selection dropdown database">
-            <input type="hidden" name="database">
-            <i class="dropdown icon"></i>
-            <div class="default text">数据库</div>
-            <div class="menu">
-                <div class="item" data-value="OWL-DEV">OWL-DEV</div>
-                <div class="item" data-value="ZOOGUARD-DEV">ZOOGUARD-DEV</div>
-            </div>
-        </div>
+    <div id="toolbar" class="ui toolbar">
         <div class="ui selection dropdown schemas">
             <input type="hidden" name="schema">
             <i class="dropdown icon"></i>
@@ -67,27 +69,74 @@
                 <div class="item" data-value="device_report_data">device_report_data</div>
             </div>
         </div>
+        <button class="ui button">添加 </button>
+    </div>
+    <div class="ui vertical menu" id="contextmenu">
+        <div class="ui item link drop-table">删除表 </div>
+        <div class="ui item link update-relation">更新关系 </div>
+    </div>
 
-        <div class="ui teal menu" style="height: 18px; margin-right: 5px;">
-            <div class="ui simple dropdown item">
-                Change
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <div class="item add-table">添加</div>
-                    <div class="item drop-table">删除</div>
-                    <div class="item save">保存</div>
-                </div>
+    <div class="ui larger modal table-relation">
+        <div class="header">更新表关系</div>
+        <div class="content">
+            <div class="ui segment">
+                    <div class="source">
+                            <select name="skills" multiple="" class="ui fluid dropdown">
+                                <option value="">源表字段</option>
+                                <option value="angular">Angular</option>
+                                <option value="css">CSS</option>
+                                <option value="design">Graphic Design</option>
+                                <option value="ember">Ember</option>
+                                <option value="html">HTML</option>
+                                <option value="ia">Information Architecture</option>
+                            </select>
+                        </div>
+                        <h4 class="ui horizontal divider">Source-->Target</h4>
+                        <div class="target">
+                            <div class="ui fluid search selection dropdown">
+                                <input type="hidden" name="country">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">选择目标表</div>
+                                <div class="menu">
+                                    <div class="item" data-value="af"><i class="af flag"></i>Afghanistan</div>
+                                    <div class="item" data-value="ax"><i class="ax flag"></i>Aland Islands</div>
+                                    <div class="item" data-value="al"><i class="al flag"></i>Albania</div>
+                                </div>
+                            </div>
+                            <div class="ui hidden divider"></div>
+                            <select name="skills" multiple="" class="ui fluid dropdown">
+                                <option value="">选择目标表字段</option>
+                                <option value="angular">Angular</option>
+                                <option value="css">CSS</option>
+                                <option value="design">Graphic Design</option>
+                                <option value="ember">Ember</option>
+                                <option value="html">HTML</option>
+                                <option value="ia">Information Architecture</option>
+                            </select>
+                        </div>
             </div>
         </div>
+        <div class="actions">
+            <div class="ui button">取消</div>
+            <div class="ui positive right button">保存</div>
+        </div>
+    </div>
 
     </div>
+    <div class="actions">
+        <div class="ui primary approve button">保存</div>
     </div>
+
+
     <script type="module">
         import { Designer } from "./js/designer.js";
-        var designer;
+        let designer;
         window.onload = function () {
             $('.ui.dropdown').dropdown();
-            designer = new Designer("container");
+            designer = new Designer({
+                container: "container",
+                contextmenu: "contextmenu"
+            });
             let table = designer.createTable("chr.history_data");
             let cellContent = [
                 ["data_time", "timestamp(6)", "Y"],
@@ -143,6 +192,14 @@
 
             $(".drop-table").click(function(){
                 designer.dropTableByTableName(designer.selectedTableName);
+            });
+
+            $(".update-relation").click(function(){
+                $('.table-relation').modal('show');
+            });
+
+            $(".save").click(function(){
+                console.log(designer.fetchAllTablesPos());
             });
         }
     </script>
