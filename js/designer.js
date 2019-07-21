@@ -30,6 +30,17 @@ export class Designer {
         this.initGrid();
         this.tables = [];
         this.relations = [];
+        this.stage.on('contextmenu', (e) => {
+            if (!e.hasOwnProperty("end")){
+                this.contextmenu.find(".item").each((index, ele)=>{
+                    if (!$(ele).hasClass("global-level")){
+                        $(ele).hide();
+                    }
+                });
+                this.contextmenu.css({"left": e.evt.x, "top": e.evt.y}).show();
+                e.evt.preventDefault(true);
+            }
+        });
     }
 
     initGrid() {
@@ -58,11 +69,8 @@ export class Designer {
             this.contextmenu.hide();
         });
 
-        // this.contextmenu.find(".item").on("click", function(){
-        //     $(this).parent().hide();
-        // })
-        this.contextmenu.find(".item").click(function(){
-            $(this).parent().hide();
+        this.contextmenu.find(".item").click(()=>{
+            this.contextmenu.hide();
         })
     }
 
@@ -79,6 +87,7 @@ export class Designer {
         this.layer.add(tableGroup);
 
         tableGroup.on('dragmove', (e) => {
+            this.contextmenu.hide();
             this.changeRelationPos(tableName, e);
         });
 
@@ -91,9 +100,12 @@ export class Designer {
         });
 
         tableGroup.on('contextmenu', (e) => {
-            console.log("right click");
+            this.contextmenu.find(".item.table-level").each((index, ele)=>{
+                $(ele).css("display", "block");
+            });
             this.contextmenu.css({"left": e.evt.x, "top": e.evt.y}).show();
             this.selectedTableName = tableName;
+            e.end = true;
             e.evt.preventDefault(true);
         });
 
@@ -156,14 +168,6 @@ export class Designer {
     changeRelationPos(tableName, e) {
         for (let rel of this.relations) {
             if (rel.srcTable.tableName === tableName || rel.tgtTable.tableName === tableName) {
-                //rel.line.group.destroy(true);
-                // rel.line.group.preventDefault();
-                // console.log(rel, rel.line, rel.line.group);
-                // console.log(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
-                // this.createRelation(rel.srcTable.tableName,rel.srcColumns,rel.tgtTable.tableName,rel.tgtColumns);
-                // rel.line.group.preventDefault();
-                //console.log("ok");
-
                 [rel.line.source, rel.line.target] = this.fetchConnectPoint(rel.srcTable, rel.srcColumns, rel.tgtTable, rel.tgtColumns);
 
                 rel.line.reDraw();
@@ -175,7 +179,7 @@ export class Designer {
     fetchAllTablesPos() {
         let tablesPos = new Map();
         for (let t of this.tables) {
-            tablesPos.set(t.tableName, [t.group.x, t.group.y]);
+            tablesPos.set(t.tableName, [t.group.x(), t.group.y()]);
         }
         return tablesPos;
     }
