@@ -1,17 +1,18 @@
 export class Table {
     constructor(group){
         this.group = group;
-        this.headerWidth = 300;
+        this.headerWidth = 0;
         this.headerHeight = 40;
         this.cellHeight = 20;
-        this.cellWidth = [140, 120, 40];
-        this.cellAlign = ["left", "left", "center"];
+        this.cellWidth = [140, 120, 200];
+        this.cellAlign = ["left", "left", "left"];
         this.rowCount = 0;
         this.columnNames = [];
     }
     
     setHeader(tableName) {
         this.tableName = tableName;
+        this.headerWidth = this.cellWidth.reduce((x,y)=>x+y);
         this.group.add(new Konva.Rect({
             x: 0,
             y: 0,

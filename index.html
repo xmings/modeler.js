@@ -114,9 +114,9 @@
             });
             let table = designer.createTable("chr.history_data");
             let cellContent = [
-                ["data_time", "timestamp(6)", "Y"],
-                ["mn_code", "varchar(100)", "Y"],
-                ["data_value", "numeric(12,5)", "N"]
+                ["data_time", "timestamp(6)", "时间"],
+                ["mn_code", "varchar(100)", "监控点"],
+                ["data_value", "numeric(12,5)", "数据值"]
             ];
             for (let i = 0; i < 3; i++) {
                 table.addRow(...cellContent[i])
@@ -124,9 +124,9 @@
 
             table = designer.createTable("rpt.owl_device_hour", 200, 300);
             cellContent = [
-                ["data_time", "timestamp(6)", "Y"],
-                ["device_id", "varchar(100)", "Y"],
-                ["data_value", "numeric(12,5)", "N"]
+                ["data_time", "timestamp(6)", "时间"],
+                ["device_id", "varchar(100)", "设备ID"],
+                ["data_value", "numeric(12,5)", "时间"]
             ];
             for (let i = 0; i < 3; i++) {
                 table.addRow(...cellContent[i])
@@ -138,9 +138,9 @@
 
             table = designer.createTable("rpt.owl_enterprise_hour", 200, 500);
             cellContent = [
-                ["data_time", "timestamp(6)", "Y"],
-                ["enterprise_code", "varchar(100)", "Y"],
-                ["data_value", "numeric(12,5)", "N"]
+                ["data_time", "timestamp(6)", "时间"],
+                ["enterprise_code", "varchar(100)", "企业号"],
+                ["data_value", "numeric(12,5)", "时间"]
             ];
             for (let i = 0; i < 3; i++) {
                 table.addRow(...cellContent[i])
