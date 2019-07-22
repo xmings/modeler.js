@@ -18,27 +18,69 @@ export class Designer {
         options = options || {
             container: "container",
             contextmenu: "contextmenu"
-        }
+        };
+        this.zoomLevel = 1;
+        this.minZoomLevel = 0.5;
+        this.maxZoomLevel = 3;
         this.stage = new Konva.Stage({
             container: options.container,
-            width: window.innerWidth,
-            height: window.innerHeight
+            width: window.innerWidth * this.maxZoomLevel,
+            height: window.innerHeight * this.maxZoomLevel,
+            draggable: true
         });
-        this.contextmenu = $("#"+options.contextmenu);
+        this.contextmenu = $("#" + options.contextmenu);
         this.layer = new Konva.Layer();
         this.gridInterval = 32;
         this.initGrid();
         this.tables = [];
         this.relations = [];
         this.stage.on('contextmenu', (e) => {
-            if (!e.hasOwnProperty("end")){
-                this.contextmenu.find(".item").each((index, ele)=>{
-                    if (!$(ele).hasClass("global-level")){
+            if (!e.hasOwnProperty("end")) {
+                this.contextmenu.find(".item").each((index, ele) => {
+                    if (!$(ele).hasClass("global-level")) {
                         $(ele).hide();
                     }
                 });
-                this.contextmenu.css({"left": e.evt.x, "top": e.evt.y}).show();
+                this.contextmenu.css({ "left": e.evt.x, "top": e.evt.y }).show();
                 e.evt.preventDefault(true);
+            }
+        });
+
+        this.stage.on('dragmove', (e) => {
+            if (this.stage.x() >0){
+                this.stage.x(0);
+            } 
+
+            if (this.stage.y() >0){
+                this.stage.y(0);
+            }
+
+            if (this.stage.x() + this.stage.width()*this.zoomLevel < this.stage.container().offsetWidth){
+                this.stage.x(this.stage.container().offsetWidth-this.stage.width()*this.zoomLevel); 
+            }
+
+            if (this.stage.y() + this.stage.height()*this.zoomLevel < window.innerHeight){
+                this.stage.y(window.innerHeight-this.stage.height()*this.zoomLevel);
+            }
+
+        });
+
+        this.stage.on('wheel', (e) => {
+            let draw = false;
+            if (this.zoomLevel>this.minZoomLevel && (e.evt.wheelDelta === -120 || e.evt.detail === -3)) {
+                this.zoomLevel = this.zoomLevel / 1.2;
+                draw = true;
+            } else if (this.zoomLevel<this.maxZoomLevel && e.evt.wheelDelta === 120 || e.evt.detail === 3) {
+                this.zoomLevel = this.zoomLevel * 1.2;
+                draw = true;
+            };
+
+            if (draw === true){
+                this.layer.scale({
+                    x: this.zoomLevel,
+                    y: this.zoomLevel
+                });
+                this.layer.draw();
             }
         });
     }
@@ -65,11 +107,11 @@ export class Designer {
             this.layer.add(line)
         };
 
-        this.stage.on("click", ()=> {
+        this.stage.on("click", () => {
             this.contextmenu.hide();
         });
 
-        this.contextmenu.find(".item").click(()=>{
+        this.contextmenu.find(".item").click(() => {
             this.contextmenu.hide();
         })
     }
@@ -100,10 +142,10 @@ export class Designer {
         });
 
         tableGroup.on('contextmenu', (e) => {
-            this.contextmenu.find(".item.table-level").each((index, ele)=>{
+            this.contextmenu.find(".item.table-level").each((index, ele) => {
                 $(ele).css("display", "block");
             });
-            this.contextmenu.css({"left": e.evt.x, "top": e.evt.y}).show();
+            this.contextmenu.css({ "left": e.evt.x, "top": e.evt.y }).show();
             this.selectedTableName = tableName;
             e.end = true;
             e.evt.preventDefault(true);
@@ -196,7 +238,7 @@ export class Designer {
             }
             table.group.destroy(true);
             this.tables.splice(this.tables.indexOf(table), 1);
-            this.relations.splice(this.relations.findIndex(r=>r.srcTable === table||r.tgtTable === table), 1);
+            this.relations.splice(this.relations.findIndex(r => r.srcTable === table || r.tgtTable === table), 1);
             this.flush();
         }
     }
