@@ -219,9 +219,9 @@ export class Designer {
     }
 
     fetchAllTablesPos() {
-        let tablesPos = new Map();
+        let tablesPos = {};
         for (let t of this.tables) {
-            tablesPos.set(t.tableName, [t.group.x(), t.group.y()]);
+            tablesPos[t.tableName] = t.group.x()+","+t.group.y();
         }
         return tablesPos;
     }
