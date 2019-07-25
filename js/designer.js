@@ -7,7 +7,6 @@ class Relation {
         this.tgtTable = tgtTable;
         this.srcColumns = [];
         this.tgtColumns = [];
-        this.relationId = 1;
         this.line = null;
     }
 }
@@ -47,35 +46,35 @@ export class Designer {
         });
 
         this.stage.on('dragmove', (e) => {
-            if (this.stage.x() >0){
+            if (this.stage.x() > 0) {
                 this.stage.x(0);
-            } 
+            }
 
-            if (this.stage.y() >0){
+            if (this.stage.y() > 0) {
                 this.stage.y(0);
             }
 
-            if (this.stage.x() + this.stage.width()*this.zoomLevel < this.stage.container().offsetWidth){
-                this.stage.x(this.stage.container().offsetWidth-this.stage.width()*this.zoomLevel); 
+            if (this.stage.x() + this.stage.width() * this.zoomLevel < this.stage.container().offsetWidth) {
+                this.stage.x(this.stage.container().offsetWidth - this.stage.width() * this.zoomLevel);
             }
 
-            if (this.stage.y() + this.stage.height()*this.zoomLevel < window.innerHeight){
-                this.stage.y(window.innerHeight-this.stage.height()*this.zoomLevel);
+            if (this.stage.y() + this.stage.height() * this.zoomLevel < window.innerHeight) {
+                this.stage.y(window.innerHeight - this.stage.height() * this.zoomLevel);
             }
 
         });
 
         this.stage.on('wheel', (e) => {
             let draw = false;
-            if (this.zoomLevel>this.minZoomLevel && (e.evt.wheelDelta === -120 || e.evt.detail === -3)) {
+            if (this.zoomLevel > this.minZoomLevel && (e.evt.wheelDelta === -120 || e.evt.detail === -3)) {
                 this.zoomLevel = this.zoomLevel / 1.2;
                 draw = true;
-            } else if (this.zoomLevel<this.maxZoomLevel && e.evt.wheelDelta === 120 || e.evt.detail === 3) {
+            } else if (this.zoomLevel < this.maxZoomLevel && e.evt.wheelDelta === 120 || e.evt.detail === 3) {
                 this.zoomLevel = this.zoomLevel * 1.2;
                 draw = true;
             };
 
-            if (draw === true){
+            if (draw === true) {
                 this.layer.scale({
                     x: this.zoomLevel,
                     y: this.zoomLevel
@@ -183,7 +182,7 @@ export class Designer {
         let srcTable = this.fetchTableByName(srcTabName),
             tgtTable = this.fetchTableByName(tgtTabName);
 
-        this.relations = this.relations.filter(function(r){
+        this.relations = this.relations.filter(function (r) {
             if (r.srcTable === srcTable && r.tgtTable === tgtTable) {
                 r.line.group.destroy(true);
                 return false;
@@ -200,7 +199,7 @@ export class Designer {
         this.layer.add(lineGroup);
 
         relation.line = new Line(lineGroup);
-        relation.relationId = relationId || 1;
+        relation.line.relationId = relationId||1;
         [relation.line.source, relation.line.target] = this.fetchConnectPoint(srcTable, srcColList, tgtTable, tgtColList);
         relation.line.start();
         this.relations.push(relation);
@@ -220,25 +219,40 @@ export class Designer {
     fetchAllTablesPos() {
         let tablesPos = {};
         for (let t of this.tables) {
-            tablesPos[t.tableName] = t.group.x()+","+t.group.y();
+            tablesPos[t.tableName] = t.group.x() + "," + t.group.y();
         }
         return tablesPos;
+    }
+
+    fetchTableRelation(srcTabName, tgtTabName) {
+        for (let r of this.relations) {
+            if (r.srcTable.tableName === srcTabName) {
+                if ((typeof tgtTabName !== "undefined"
+                    && r.tgtTable.tableName === tgtTabName)
+                    || typeof tgtTabName === "undefined") {
+                    return {
+                        src: r.srcColumns,
+                        tgt: r.tgtColumns
+                    }
+                }
+            }
+        }
     }
 
     dropTableByTableName(tableName) {
         if (tableName !== null) {
             let table = this.fetchTableByName(tableName);
-            for (let r of this.relations) {
-                if (r.srcTable.tableName === tableName) {
+            this.relations = this.relations.filter(function (r) {
+                if (r.srcTable === table || r.tgtTable === table) {
                     r.line.group.destroy(true);
-                } else if (r.tgtTable.tableName === tableName) {
-                    r.line.group.destroy(true);
+                    return false;
                 }
-            }
+                return true;
+            });
+
             table.group.destroy(true);
             this.tables.splice(this.tables.indexOf(table), 1);
-            this.relations.splice(this.relations.findIndex(r => r.srcTable === table || r.tgtTable === table), 1);
-            this.flush();
+            this.layer.draw();
         }
     }
 

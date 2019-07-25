@@ -65,7 +65,7 @@
                     <select name="source-columns" multiple="" class="ui fluid dropdown source-columns">
                         <option value="">源表字段</option>
                         <option value="data_time">data_time</option>
-                        <option value="mn_code">mn_code</option>
+                        <option value="mn_code">device_id</option>
                         <option value="data_value">data_value</option>
                     </select>
                 </div>
@@ -73,13 +73,13 @@
                 <div class="target">
                     <select name="target-table" class="ui fluid dropdown target-table">
                         <option value="">选择目标表</option>
-                        <option value="rpt.owl_device_hour">rpt.owl_device_hour</option>
+                        <option value="chr.history_data">chr.history_data</option>
                     </select>
                     <div class="ui hidden divider"></div>
                     <select name="target-columns" multiple="" class="ui fluid dropdown target-columns">
                         <option value="">选择目标表字段</option>
                         <option value="data_time">data_time</option>
-                        <option value="device_id">device_id</option>
+                        <option value="device_id">mn_code</option>
                         <option value="data_value">data_value</option>
                     </select>
                 </div>
@@ -121,9 +121,9 @@
                 table.addRow(...cellContent[i])
             };
 
-            designer.drawRelation("chr.history_data", ["data_time", "data_value"], "rpt.owl_device_hour", [
+            designer.drawRelation("rpt.owl_device_hour", [
                 "data_time", "data_value"
-            ], 0)
+            ], "chr.history_data", ["data_time", "data_value"], 3)
 
             // rpt.owl_enterprise_hour
             table = designer.createTable("rpt.owl_enterprise_hour", 200, 500);
@@ -136,9 +136,9 @@
                 table.addRow(...cellContent[i])
             };
 
-            designer.drawRelation("rpt.owl_enterprise_hour", ["data_time", "data_value"], "rpt.owl_device_hour", [
+            designer.drawRelation("rpt.owl_device_hour", [
                 "data_time", "data_value"
-            ]);
+            ],"rpt.owl_enterprise_hour", ["data_time", "data_value"], 2);
 
             designer.flush();
 
@@ -166,7 +166,16 @@
                     $(".target-columns").dropdown("get value")
                 );
 
-            })
+                console.log(
+                    designer.selectedTableName, 
+                    $(".source-columns").dropdown("get value"),
+                    $(".target-table").dropdown("get value"),
+                    $(".target-columns").dropdown("get value")
+                )
+
+            });
+            console.log(designer.fetchTableRelation("rpt.owl_device_hour"));
+            console.log(designer.relations)
 
         }
     </script>
