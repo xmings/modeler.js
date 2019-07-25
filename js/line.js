@@ -50,7 +50,6 @@ export class Line {
             let line = new Konva.Line({
                 points: [pos[0], pos[1], this.tgtFocusX, this.tgtFocusY],
                 stroke: 'black',
-
             });
             this.tgtLines.push(line);
             this.group.add(line);
@@ -65,11 +64,25 @@ export class Line {
         });
         this.group.add(this.arrow);
 
+        let srcText, tgtText;
+        if (this.relationId === 2){
+            srcText = '1';
+            tgtText = 'N';
+        } else if (this.relationId === 3){
+            srcText = 'N';
+            tgtText = '1';
+        } else if (this.relationId === 4){
+            srcText = 'N';
+            tgtText = 'N';
+        } else {
+            srcText = '1';
+            tgtText = '1';
+        }  
 
         this.srcLabel = new Konva.Text({
             x: this.srcFocusX,
             y: this.srcFocusY,
-            text: '1',
+            text: srcText,
             fontSize: 14,
             stroke: "red"
         });
@@ -79,7 +92,7 @@ export class Line {
         this.tgtLabel = new Konva.Text({
             x: this.tgtFocusX,
             y: this.tgtFocusY,
-            text: 'N',
+            text: tgtText,
             fontSize: 14,
             stroke: "red"
         });
@@ -87,7 +100,7 @@ export class Line {
         this.group.add(this.tgtLabel);
     }
 
-    reDraw() {
+    move() {
         this.fetchFocusPos();
         let i = 0;
         for (let sl of this.srcLines) {

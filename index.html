@@ -32,7 +32,7 @@
         <a class="item add-table global-level">新增表 </a>
         <a class="item drop-table table-level">删除表 </a>
         <a class="item update-relation table-level">更新关系 </a>
-        <a class="item save global-level">保存位置 </a>
+        <a class="item save-position global-level">保存位置 </a>
     </div>
 
     <div class="ui larger modal table-addition">
@@ -45,15 +45,15 @@
                 <option value="owl">owl</option>
             </select>
             <div class="ui hidden divider"></div>
-            <select name="table" multiple=""  class="ui fluid dropdown">
+            <select name="table" multiple="" class="ui fluid dropdown">
                 <option value="">Table</option>
                 <option value="history_data">history_data</option>
                 <option value="device_report_data">device_report_data</option>
             </select>
         </div>
         <div class="actions">
-            <div class="ui button">取消</div>
-            <div class="ui positive right button">保存</div>
+            <div class="ui button cancel">取消</div>
+            <div class="ui positive right button save-tables">保存</div>
         </div>
     </div>
 
@@ -62,44 +62,32 @@
         <div class="content">
             <div class="ui segment">
                 <div class="source">
-                    <select name="skills" multiple="" class="ui fluid dropdown">
+                    <select name="source-columns" multiple="" class="ui fluid dropdown source-columns">
                         <option value="">源表字段</option>
-                        <option value="angular">Angular</option>
-                        <option value="css">CSS</option>
-                        <option value="design">Graphic Design</option>
-                        <option value="ember">Ember</option>
-                        <option value="html">HTML</option>
-                        <option value="ia">Information Architecture</option>
+                        <option value="data_time">data_time</option>
+                        <option value="mn_code">mn_code</option>
+                        <option value="data_value">data_value</option>
                     </select>
                 </div>
                 <h4 class="ui horizontal divider">Source <i class="arrow right icon"></i> Target</h4>
                 <div class="target">
-                    <div class="ui fluid search selection dropdown">
-                        <input type="hidden" name="country">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">选择目标表</div>
-                        <div class="menu">
-                            <div class="item" data-value="af"><i class="af flag"></i>Afghanistan</div>
-                            <div class="item" data-value="ax"><i class="ax flag"></i>Aland Islands</div>
-                            <div class="item" data-value="al"><i class="al flag"></i>Albania</div>
-                        </div>
-                    </div>
+                    <select name="target-table" class="ui fluid dropdown target-table">
+                        <option value="">选择目标表</option>
+                        <option value="rpt.owl_device_hour">rpt.owl_device_hour</option>
+                    </select>
                     <div class="ui hidden divider"></div>
-                    <select name="skills" multiple="" class="ui fluid dropdown">
+                    <select name="target-columns" multiple="" class="ui fluid dropdown target-columns">
                         <option value="">选择目标表字段</option>
-                        <option value="angular">Angular</option>
-                        <option value="css">CSS</option>
-                        <option value="design">Graphic Design</option>
-                        <option value="ember">Ember</option>
-                        <option value="html">HTML</option>
-                        <option value="ia">Information Architecture</option>
+                        <option value="data_time">data_time</option>
+                        <option value="device_id">device_id</option>
+                        <option value="data_value">data_value</option>
                     </select>
                 </div>
             </div>
         </div>
         <div class="actions">
-            <div class="ui button">取消</div>
-            <div class="ui positive right button">保存</div>
+            <div class="ui button cancel">取消</div>
+            <div class="ui positive right button save-relation">保存</div>
         </div>
     </div>
 
@@ -112,6 +100,7 @@
                 container: "container",
                 contextmenu: "contextmenu"
             });
+            // chr.history_data
             let table = designer.createTable("chr.history_data");
             let cellContent = [
                 ["data_time", "timestamp(6)", "时间"],
@@ -121,7 +110,7 @@
             for (let i = 0; i < 3; i++) {
                 table.addRow(...cellContent[i])
             };
-
+            // rpt.owl_device_hour
             table = designer.createTable("rpt.owl_device_hour", 200, 300);
             cellContent = [
                 ["data_time", "timestamp(6)", "时间"],
@@ -132,10 +121,11 @@
                 table.addRow(...cellContent[i])
             };
 
-            designer.createRelation("chr.history_data", ["data_time", "data_value"], "rpt.owl_device_hour", [
+            designer.drawRelation("chr.history_data", ["data_time", "data_value"], "rpt.owl_device_hour", [
                 "data_time", "data_value"
             ], 0)
 
+            // rpt.owl_enterprise_hour
             table = designer.createTable("rpt.owl_enterprise_hour", 200, 500);
             cellContent = [
                 ["data_time", "timestamp(6)", "时间"],
@@ -146,7 +136,7 @@
                 table.addRow(...cellContent[i])
             };
 
-            designer.createRelation("rpt.owl_enterprise_hour", ["data_time", "data_value"], "rpt.owl_device_hour", [
+            designer.drawRelation("rpt.owl_enterprise_hour", ["data_time", "data_value"], "rpt.owl_device_hour", [
                 "data_time", "data_value"
             ]);
 
@@ -164,11 +154,20 @@
                 $('.table-relation').modal('show');
             });
 
-            $(".save").click(function(){
+            $(".save-position").click(function(){
                 console.log(designer.fetchAllTablesPos());
             });
 
-            console.log(designer.fetchAllTablesPos())
+            $(".save-relation").click(function(){
+                designer.drawRelation(
+                    designer.selectedTableName, 
+                    $(".source-columns").dropdown("get value"),
+                    $(".target-table").dropdown("get value"),
+                    $(".target-columns").dropdown("get value")
+                );
+
+            })
+
         }
     </script>
 </body>

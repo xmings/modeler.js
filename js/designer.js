@@ -9,7 +9,6 @@ class Relation {
         this.tgtColumns = [];
         this.relationId = 1;
         this.line = null;
-        this.selectedTableName = null;
     }
 }
 
@@ -30,6 +29,7 @@ export class Designer {
         });
         this.contextmenu = $("#" + options.contextmenu);
         this.layer = new Konva.Layer();
+        this.selectedTableName = null;
         this.gridInterval = 32;
         this.initGrid();
         this.tables = [];
@@ -179,9 +179,17 @@ export class Designer {
         return [srcColsPos, tgtColsPos];
     }
 
-    createRelation(srcTabName, srcColList, tgtTabName, tgtColList, relationId) {
+    drawRelation(srcTabName, srcColList, tgtTabName, tgtColList, relationId) {
         let srcTable = this.fetchTableByName(srcTabName),
             tgtTable = this.fetchTableByName(tgtTabName);
+
+        this.relations = this.relations.filter(function(r){
+            if (r.srcTable === srcTable && r.tgtTable === tgtTable) {
+                r.line.group.destroy(true);
+                return false;
+            }
+            return true;
+        })
 
         let relation = new Relation(srcTable, tgtTable);
         relation.srcColumns = srcColList;
@@ -195,15 +203,8 @@ export class Designer {
         relation.relationId = relationId || 1;
         [relation.line.source, relation.line.target] = this.fetchConnectPoint(srcTable, srcColList, tgtTable, tgtColList);
         relation.line.start();
-
-        for (let r of this.relations) {
-            if (r.srcTable.tableName === srcTabName
-                && r.tgtTable.tableName === tgtTabName) {
-                return;
-            }
-        }
-
         this.relations.push(relation);
+        this.layer.draw();
     }
 
 
@@ -211,9 +212,7 @@ export class Designer {
         for (let rel of this.relations) {
             if (rel.srcTable.tableName === tableName || rel.tgtTable.tableName === tableName) {
                 [rel.line.source, rel.line.target] = this.fetchConnectPoint(rel.srcTable, rel.srcColumns, rel.tgtTable, rel.tgtColumns);
-
-                rel.line.reDraw();
-
+                rel.line.move();
             }
         }
     }
