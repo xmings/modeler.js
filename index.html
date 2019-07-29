@@ -45,10 +45,8 @@
                 <option value="owl">owl</option>
             </select>
             <div class="ui hidden divider"></div>
-            <select name="table" multiple="" class="ui fluid dropdown">
+            <select name="table" multiple="" class="ui fluid dropdown tables">
                 <option value="">Table</option>
-                <option value="history_data">history_data</option>
-                <option value="device_report_data">device_report_data</option>
             </select>
         </div>
         <div class="actions">
@@ -175,7 +173,15 @@
 
             });
             console.log(designer.fetchTableRelation("rpt.owl_device_hour"));
-            console.log(designer.relations)
+            console.log(designer.relations);
+
+            $(".tables").dropdown({
+                values: [
+                {name: "abc", value: "abc"},
+                {name: "cde", value: "cde"},
+
+                ]
+            })
 
         }
     </script>

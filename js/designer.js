@@ -231,8 +231,9 @@ export class Designer {
                     && r.tgtTable.tableName === tgtTabName)
                     || typeof tgtTabName === "undefined") {
                     return {
-                        src: r.srcColumns,
-                        tgt: r.tgtColumns
+                        srcColumns: r.srcColumns,
+                        tgtTable: r.tgtTable.tableName,
+                        tgtColumns: r.tgtColumns
                     }
                 }
             }
@@ -240,10 +241,12 @@ export class Designer {
     }
 
     dropTableByTableName(tableName) {
+        let dependence_tables = [];
         if (tableName !== null) {
             let table = this.fetchTableByName(tableName);
             this.relations = this.relations.filter(function (r) {
                 if (r.srcTable === table || r.tgtTable === table) {
+                    dependence_tables.push(r.srcTable === table ? r.tgtTable.tableName: r.srcTable.tableName);
                     r.line.group.destroy(true);
                     return false;
                 }
@@ -254,6 +257,7 @@ export class Designer {
             this.tables.splice(this.tables.indexOf(table), 1);
             this.layer.draw();
         }
+        return dependence_tables;
     }
 
     flush() {
