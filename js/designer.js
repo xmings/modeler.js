@@ -240,46 +240,46 @@ export class Designer {
         }
     }
 
-    showTableByKeyword(keyword, type){
-        let unmatch_tables = [];
+    showTableByKeyword(keyword, type) {
+        let match_tables = [];
+        this.layer.find(".header").setAttr("fill", "black");
 
-        if (type === "schema"){
-            for (let t of this.tables){
-                let shema = t.tableName.split(".")[0]
-                if (shema.indexOf(keyword) < 0){
-                    unmatch_tables.push(t);
+        if (type === "schema") {
+            for (let t of this.tables) {
+                let shema = t.tableName.split(".")[0];
+                if (shema.indexOf(keyword) >= 0) {
+                    match_tables.push(t);
                 }
             }
-        }else if (type === "table"){
-            for (let t of this.tables){
-                let table = t.tableName.split(".")[1]
-                if (table.indexOf(keyword) < 0){
-                    unmatch_tables.push(t);
+        } else if (type === "table") {
+            for (let t of this.tables) {
+                let table = t.tableName.split(".")[1];
+                if (table.indexOf(keyword) >= 0) {
+                    match_tables.push(t);
                 }
             }
-        }else if (type==="column"){
-            for (let t of this.tables){
-                let matchCols = t.columnNames.filter(()=>{
-                    return x.indexOf(keyword)>=0;
-                })
-                if (matchCols.length === 0){
-                    unmatch_tables.push(t);
+        } else if (type === "column") {
+            for (let t of this.tables) {
+                if (t.columnNames.some((x) => {
+                    return x.indexOf(keyword) >= 0;
+                })) {
+                    match_tables.push(t);
                 }
             }
-        }else if (type==="description"){
-            for (let t of this.tables){
-                let matchDescriptions = t.descriptions.filter(()=>{
-                    return x.indexOf(keyword)>=0;
-                })
-                if (matchDescriptions.length === 0){
-                    unmatch_tables.push(t);
+        } else if (type === "description") {
+            for (let t of this.tables) {
+                if (t.descriptions.some((x) => {
+                    return x.indexOf(keyword) >= 0;
+                })) {
+                    match_tables.push(t);
                 }
             }
         }
 
-        for (let t of unmatch_tables) {
-            this.dropTableByTableName(t.tableName);
+        for (let t of match_tables) {
+            t.group.find(".header").setAttr("fill", "#F44336");
         }
+        this.layer.draw();
     }
 
 
