@@ -29,10 +29,22 @@
 <body>
     <div id="container"></div>
     <div class="ui basic vertical menu" id="contextmenu">
+        <a class="item search-table global-level">搜索表 </a>
         <a class="item add-table global-level">新增表 </a>
         <a class="item drop-table table-level">删除表 </a>
         <a class="item update-relation table-level">更新关系 </a>
         <a class="item save-position global-level">保存位置 </a>
+    </div>
+    <div class="ui action input" id="search"
+        style="position: fixed; right: 10px; top: 10px; z-index: 1000; display: none">
+        <select class="ui compact selection dropdown">
+            <option value="schema">Schema</option>
+            <option value="table">表名</option>
+            <option value="column">列名</option>
+            <option value="description">注释</option>
+        </select>
+        <input type="text" placeholder="Search...">
+        <div class="ui button">搜索</div>
     </div>
 
     <div class="ui larger modal table-addition">
@@ -142,6 +154,17 @@
 
             $(".drop-table").click(function(){
                 designer.dropTableByTableName(designer.selectedTableName);
+            });
+
+            $(".search-table").click(function(){
+                $("#search").show();
+            });
+
+            $("#search .button").click(function(){
+                let type = $("#search select").val();
+                let keyword = $("#search input").val();
+                console.log(keyword, type);
+                designer.showTableByKeyword(keyword, type);
             });
 
             $(".add-table").click(function(){

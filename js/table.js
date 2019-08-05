@@ -8,6 +8,7 @@ export class Table {
         this.cellAlign = ["left", "left", "left"];
         this.rowCount = 0;
         this.columnNames = [];
+        this.descriptions = [];
     }
     
     setHeader(tableName) {
@@ -37,10 +38,11 @@ export class Table {
         }))
     }
 
-    addRow(columnName, dataType, notNull) {
-        let cellText = [columnName, dataType, notNull];
+    addRow(columnName, dataType, description) {
+        let cellText = [columnName, dataType, description];
         let startX = 0, startY = this.headerHeight + this.cellHeight*this.rowCount;
         this.columnNames.push(columnName);
+        this.descriptions.push(description);
     
         for (let i=0;i<this.cellWidth.length; i++){
             this.group.add(new Konva.Rect({
@@ -70,7 +72,7 @@ export class Table {
         this.rowCount += 1;
     }
 
-    updateCell(columnName, dataType, notNull) {
+    updateCell(columnName, dataType, description) {
     
     }
     
